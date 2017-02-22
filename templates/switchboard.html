@@ -1,14 +1,16 @@
 <html>
   <head>
     <title>Experiments</title>
-   <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
   <body>
   	<h1>Experiments</h1>
-  	{% for ex in experiments %}
+  	<form method="POST">
+  	{% for index, ex in experiments %}
 	  	<p>
-	  	<a href="report?key={{ex[1]().urlsafe()}}">{{ex[0]}}</a>
+	  	<button name="run" value="{{index}}">{{ex[0]}}</button>
+<!-- 	  	<a href="report?key={ex[1]().urlsafe()}}">{{ex[0]}}</a>  -->
 	  	</p>
   	{% endfor %}
+  	</form>
   </body>
 </html>

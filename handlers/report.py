@@ -6,12 +6,18 @@ def get_report(app):
     @app.route('/report')
     def report():
         keystr = request.args.get('key')
-        key = ndb.Key(urlsafe=keystr)
-        obj = key.get()
-        return render_template(
-            "report.html", 
-            objjson = json.dumps(obj.to_dict(), indent=2, sort_keys=True),
-            keystr = keystr
-        )
+        if keystr:
+            key = ndb.Key(urlsafe=keystr)
+            obj = key.get()
+            return render_template(
+                "report.html", 
+                objjson = json.dumps(obj.to_dict(), indent=2, sort_keys=True),
+                keystr = keystr
+            )
+        else:
+            return render_template(
+                "report.html"
+            )
+            
 
     return report
