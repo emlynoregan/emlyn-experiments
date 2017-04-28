@@ -1,6 +1,5 @@
 from model.account import Account
-from taskutils import shardedmap, futureshardedmap
-from taskutils.sharded import shardedpagemap
+from taskutils import ndbshardedmap, futurendbshardedmap, ndbshardedpagemap
 from google.appengine.ext import ndb
 
 def DeleteAccountsWithShardedMapExperiment():
@@ -8,7 +7,7 @@ def DeleteAccountsWithShardedMapExperiment():
         def DeleteAccount(account):
             account.key.delete()
 
-        shardedmap(DeleteAccount, ndbquery = Account.query())            
+        ndbshardedmap(DeleteAccount, ndbquery = Account.query())            
     return "Delete Accounts With Sharded Map", Go
 
 def DeleteAccountsWithFutureShardedMapExperiment():
@@ -16,7 +15,7 @@ def DeleteAccountsWithFutureShardedMapExperiment():
         def DeleteAccount(account):
             account.key.delete()
 
-        return futureshardedmap(DeleteAccount, ndbquery = Account.query()).key
+        return futurendbshardedmap(DeleteAccount, ndbquery = Account.query()).key
     return "Delete Accounts With Future Sharded Map", Go
 
 def DeleteAccountsWithShardedPageMapExperiment():
@@ -24,5 +23,5 @@ def DeleteAccountsWithShardedPageMapExperiment():
         def DeleteAccounts(keys):
             ndb.delete_multi(keys)
 
-        shardedpagemap(DeleteAccounts, ndbquery = Account.query())
+        ndbshardedpagemap(DeleteAccounts, ndbquery = Account.query())
     return "Delete Accounts With Sharded Page Map", Go

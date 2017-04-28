@@ -4,6 +4,11 @@
   </head>
   <body>
   	<h3><a href="/">&lt; experiments</a></h3>
+{% if iscancellable %}
+  	<form method="POST">
+	  <button name="cancel" value="true">Cancel</button>
+	</form>
+{% endif %}
   {% if keystr %}
   	<h1>Report for {{keystr}}</h1>
 <pre>{{objjson|safe}}</pre>

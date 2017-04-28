@@ -1,7 +1,3 @@
-from model.account import Account
-from google.appengine.ext import ndb
-from taskutils import task
-import logging
 from google.appengine.api import taskqueue
 
 def MaxTaskSizeExperiment():

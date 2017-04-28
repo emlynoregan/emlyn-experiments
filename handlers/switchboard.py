@@ -9,9 +9,11 @@ from experiments.deleteaccountswithshardedmap import DeleteAccountsWithShardedMa
 from experiments.makeaccounts import MakeAccountsExperiment
 from experiments.countaccountswithfuture import CountAccountsWithFutureExperiment, CountAccountsWithFutureShardedMapExperiment, CountAllUnderscoreEntitiesExperiment
 from experiments.maxtasksize import MaxTaskSizeExperiment
+from experiments.traversefilewithshardedmap import TraverseFileWithShardedMapExperiment
 
 def get_switchboard(app):
     experiments = [
+        TraverseFileWithShardedMapExperiment(),
         CountAllUnderscoreEntitiesExperiment(),
         CountAccountsWithFutureShardedMapExperiment(),
         IncrementAccountsWithFutureShardedMapExperiment(),

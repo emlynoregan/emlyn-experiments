@@ -1,16 +1,14 @@
 from model.account import Account
-from taskutils import future, FutureUnderwayError, futureshardedmap
+from taskutils import future, FutureReadyForResult, get_children, futurendbshardedpagemap
 import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import metadata
-from taskutils.future import get_children
-from taskutils.sharded import futureshardedpagemap
 
 def CountAccountsWithFutureExperiment():
     def Go():
-        def CountRemaining(cursor, futurekey):
+        def CountRemaining(cursor, weight, futurekey):
             accounts, cursor, kontinue = Account.query().fetch_page(
-                100, start_cursor = cursor
+                2000, start_cursor = cursor
             )
             
             numaccounts = len(accounts)
@@ -38,20 +36,20 @@ def CountAccountsWithFutureExperiment():
 #                     if childfuture:
 #                         childfuture.key.delete()
         
-                future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure)(cursor)
+                future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure, weight=weight-len(accounts))(cursor, weight=weight-len(accounts))
                                 
-                raise FutureUnderwayError("still calculating")
+                raise FutureReadyForResult("still calculating")
             else:
                 return numaccounts
         
-        countfuture = future(CountRemaining, includefuturekey=True, queue="background")(None)
+        countfuture = future(CountRemaining, includefuturekey=True, queue="background", weight=10000)(None, weight=10000)
         return countfuture.key
         
     return "Count Accounts With Future", Go
 
 def CountAccountsWithFutureShardedMapExperiment():
     def Go():
-        futureobj = futureshardedpagemap(None, Account.query(), queue="background")
+        futureobj = futurendbshardedpagemap(None, Account.query(), queue="background")
         return futureobj.key
     return "Count Accounts With Future Sharded Map", Go
 
@@ -87,7 +85,7 @@ def CountAllUnderscoreEntitiesExperiment():
             
                     future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure)(kind, cursor)
                                     
-                    raise FutureUnderwayError("still calculating")
+                    raise FutureReadyForResult("still calculating")
                 else:
                     return numaccounts
             
@@ -126,7 +124,7 @@ def CountAllUnderscoreEntitiesExperiment():
                     future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure)(kind, None)
 
             if didone:
-                raise FutureUnderwayError("still calculating")
+                raise FutureReadyForResult("still calculating")
             else:
                 return 0
             
