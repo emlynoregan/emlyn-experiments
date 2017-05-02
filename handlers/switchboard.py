@@ -3,19 +3,23 @@ from flask import render_template, request, redirect
 from experiments.helloworld import HelloWorldExperiment
 from experiments.incrementaccountsnaive import IncrementAccountsExperimentNaive
 from experiments.incrementaccountswithtask import IncrementAccountsWithTaskExperiment
-from experiments.incrementaccountswithshardedmap import IncrementAccountsWithShardedMapExperiment, IncrementAccountsWithFutureShardedMapExperiment
+from experiments.incrementaccountswithshardedmap import IncrementAccountsWithShardedMapExperiment, IncrementAccountsWithFutureShardedMapExperiment,\
+    CountAndIncrementAccountsExperiment
 from experiments.deleteaccountswithshardedmap import DeleteAccountsWithShardedMapExperiment, DeleteAccountsWithFutureShardedMapExperiment,\
     DeleteAccountsWithShardedPageMapExperiment
 from experiments.makeaccounts import MakeAccountsExperiment
 from experiments.countaccountswithfuture import CountAccountsWithFutureExperiment, CountAccountsWithFutureShardedMapExperiment, CountAllUnderscoreEntitiesExperiment
 from experiments.maxtasksize import MaxTaskSizeExperiment
-from experiments.traversefilewithshardedmap import TraverseFileWithShardedMapExperiment
+from experiments.traversefilewithshardedmap import TraverseFileWithShardedMapExperiment,\
+    TraverseFileWithFutureShardedMapExperiment
 
 def get_switchboard(app):
     experiments = [
+        TraverseFileWithFutureShardedMapExperiment(),
         TraverseFileWithShardedMapExperiment(),
         CountAllUnderscoreEntitiesExperiment(),
         CountAccountsWithFutureShardedMapExperiment(),
+        CountAndIncrementAccountsExperiment(),
         IncrementAccountsWithFutureShardedMapExperiment(),
         DeleteAccountsWithFutureShardedMapExperiment(),
         CountAccountsWithFutureExperiment(),
