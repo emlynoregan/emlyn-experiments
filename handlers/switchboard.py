@@ -8,7 +8,8 @@ from experiments.incrementaccountswithshardedmap import IncrementAccountsWithSha
 from experiments.deleteaccountswithshardedmap import DeleteAccountsWithShardedMapExperiment, DeleteAccountsWithFutureShardedMapExperiment,\
     DeleteAccountsWithShardedPageMapExperiment
 from experiments.makeaccounts import MakeAccountsExperiment
-from experiments.countaccountswithfuture import CountAccountsWithFutureExperiment, CountAccountsWithFutureShardedMapExperiment, CountAllUnderscoreEntitiesExperiment
+from experiments.countaccountswithfuture import CountAccountsWithFutureExperiment, CountAccountsWithFutureShardedMapExperiment, CountAllUnderscoreEntitiesExperiment,\
+    SummarizeAccountsWithFutureShardedMapExperiment
 from experiments.maxtasksize import MaxTaskSizeExperiment
 from experiments.traversefilewithshardedmap import TraverseFileWithShardedMapExperiment,\
     TraverseFileWithFutureShardedMapExperiment
@@ -23,6 +24,7 @@ def get_switchboard(app):
         IncrementAccountsWithFutureShardedMapExperiment(),
         DeleteAccountsWithFutureShardedMapExperiment(),
         CountAccountsWithFutureExperiment(),
+        SummarizeAccountsWithFutureShardedMapExperiment(),
         IncrementAccountsWithShardedMapExperiment(),
         IncrementAccountsWithTaskExperiment(),
         IncrementAccountsExperimentNaive(),

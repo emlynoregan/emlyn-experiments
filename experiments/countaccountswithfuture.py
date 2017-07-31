@@ -4,7 +4,7 @@ from taskutils.future2 import future, FutureReadyForResult, get_children, setloc
 import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import metadata
-from taskutils.ndbsharded2 import futurendbshardedpagemap
+from taskutils.ndbsharded2 import futurendbshardedpagemap, futurendbshardedmap
 
 def CountAccountsWithFutureExperiment():
     def Go():
@@ -36,6 +36,42 @@ def CountAccountsWithFutureShardedMapExperiment():
         futureobj = futurendbshardedpagemap(None, Account.query(), queue="background")
         return futureobj.key
     return "Count Accounts With Future Sharded Map", Go
+
+
+def SummarizeAccountsWithFutureShardedMapExperiment():
+    def Go():
+        def mapobj(futurekey, account):
+            retval = {}
+            
+            if account:
+                resultkey = "balance=%s" % (account.balance if account.balance else 0)
+                retval[resultkey] = 1
+            
+            return retval
+
+        def mappage(futurekey, keys):
+            retval = {}
+
+            for key in keys:            
+                account = key.get()
+                if account:
+                    resultkey = "balance=%s" % (account.balance if account.balance else 0)
+                    retval[resultkey] = retval.get(resultkey, 0) + 1
+            
+            return retval
+
+        def combineresults(result1, result2):
+            retval = {}
+            def addresults(result):
+                for key, value in result.items():
+                    retval[key] = retval.get(key, 0) + value
+            addresults(result1)
+            addresults(result2)
+            return retval
+        
+        futureobj = futurendbshardedpagemap(mappage, Account.query(), initialresult = {}, oncombineresultsf=combineresults, queue="background")
+        return futureobj.key
+    return "Summarize Accounts With Future Sharded Map", Go
 
 def CountAllUnderscoreEntitiesExperiment():
     def Go():
