@@ -1,48 +1,32 @@
 from model.account import Account
-from taskutils import future, FutureReadyForResult, get_children, futurendbshardedpagemap
+from taskutils.future2 import future, FutureReadyForResult, get_children, setlocalprogress,\
+    GenerateOnAllChildSuccess
 import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import metadata
+from taskutils.ndbsharded2 import futurendbshardedpagemap
 
 def CountAccountsWithFutureExperiment():
     def Go():
-        def CountRemaining(cursor, weight, futurekey):
+        def CountRemaining(futurekey, cursor):
             accounts, cursor, kontinue = Account.query().fetch_page(
-                2000, start_cursor = cursor
+                200, start_cursor = cursor
             )
             
             numaccounts = len(accounts)
             
+            setlocalprogress(futurekey, numaccounts)
+            
             if kontinue:
-                def OnSuccess(childfuture):
-                    parentfuture = futurekey.get()
-                    try:
-                        if childfuture and parentfuture:
-                            result = numaccounts + childfuture.get_result()
-                            parentfuture.set_success(result)
-                    except Exception, ex:
-                        logging.exception(ex)
-                        raise ex
-#                     if childfuture:
-#                         childfuture.key.delete()
-                        
-                def OnFailure(childfuture):
-                    parentfuture = futurekey.get()
-                    if childfuture and parentfuture:
-                        try:
-                            childfuture.get_result() # should throw
-                        except Exception, ex:
-                            parentfuture.set_failure(ex)
-#                     if childfuture:
-#                         childfuture.key.delete()
+                lonallchildsuccessf = GenerateOnAllChildSuccess(futurekey, numaccounts, lambda x, y: x+y)
         
-                future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure, weight=weight-len(accounts))(cursor, weight=weight-len(accounts))
+                future(CountRemaining, parentkey=futurekey, queue="background", onallchildsuccessf=lonallchildsuccessf)(cursor)
                                 
                 raise FutureReadyForResult("still calculating")
             else:
                 return numaccounts
         
-        countfuture = future(CountRemaining, includefuturekey=True, queue="background", weight=10000)(None, weight=10000)
+        countfuture = future(CountRemaining, queue="background")(None)
         return countfuture.key
         
     return "Count Accounts With Future", Go
@@ -55,73 +39,33 @@ def CountAccountsWithFutureShardedMapExperiment():
 
 def CountAllUnderscoreEntitiesExperiment():
     def Go():
-        @future(includefuturekey=True, queue = "background")
+        @future(queue = "background")
         def CountAllUnderscore(futurekey):
-            def CountRemaining(kind, cursor, futurekey):
+            def CountRemaining(futurekey, kind, cursor):
                 accounts, cursor, kontinue = ndb.Query(kind = kind).fetch_page(
                     100, start_cursor = cursor
                 )
                 
                 numaccounts = len(accounts)
                 
+                setlocalprogress(futurekey, numaccounts)
+                
                 if kontinue:
-                    def OnSuccess(childfuture):
-                        parentfuture = futurekey.get()
-                        try:
-                            if childfuture and parentfuture:
-                                result = numaccounts + childfuture.get_result()
-                                parentfuture.set_success(result)
-                        except Exception, ex:
-                            logging.exception(ex)
-                            raise ex
-                            
-                    def OnFailure(childfuture):
-                        parentfuture = futurekey.get()
-                        if childfuture and parentfuture:
-                            try:
-                                childfuture.get_result() # should throw
-                            except Exception, ex:
-                                parentfuture.set_failure(ex)
+                    lonallchildsuccessf = GenerateOnAllChildSuccess(futurekey, numaccounts, lambda x,y: x + y)
             
-                    future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure)(kind, cursor)
+                    future(CountRemaining, parentkey=futurekey, queue="background", onallchildsuccessf=lonallchildsuccessf)(kind, cursor)
                                     
                     raise FutureReadyForResult("still calculating")
                 else:
                     return numaccounts
             
-            def OnSuccess(childfuture):
-                parentfuture = futurekey.get()
-                children = get_children(futurekey)
-                result = 0
-                noresult = False
-                for child in children:
-                    if child.has_result():
-                        try:
-                            result += child.get_result()
-                        except Exception, ex:
-                            parentfuture.set_failure(ex)
-                            break
-                    else:
-                        noresult = True
-                        break
-                
-                if not noresult:
-                    parentfuture.set_success(result)
-                    
-            def OnFailure(childfuture):
-                parentfuture = futurekey.get()
-                if childfuture and parentfuture:
-                    try:
-                        childfuture.get_result() # should throw
-                    except Exception, ex:
-                        parentfuture.set_failure(ex)
-
             didone = False
             for kind in metadata.get_kinds():
                 if kind and kind[0] == "_":
                     didone = True
                     logging.debug("----------------- %s" % kind)
-                    future(CountRemaining, parentkey=futurekey, includefuturekey=True, queue="background", onsuccessf=OnSuccess, onfailuref=OnFailure)(kind, None)
+                    lonallchildsuccessf = GenerateOnAllChildSuccess(futurekey, 0, lambda x,y: x + y)
+                    future(CountRemaining, parentkey=futurekey, queue="background", onallchildsuccessf=lonallchildsuccessf)(kind, None)
 
             if didone:
                 raise FutureReadyForResult("still calculating")

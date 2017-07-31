@@ -1,10 +1,15 @@
 import logging
-from taskutils.gcsfilesharded import gcsfileshardedpagemap,\
+from taskutils.gcsfilesharded2 import gcsfileshardedpagemap,\
     futuregcsfileshardedpagemap
 
 def LogPage(page):
     for line in page:
         logging.debug(line)
+
+def LogPageFuture(futurekey, page):
+    for line in page:
+        logging.debug(line)
+    return len(page)
 
 def TraverseFileWithShardedMapExperiment():
     def Go():
@@ -13,6 +18,6 @@ def TraverseFileWithShardedMapExperiment():
 
 def TraverseFileWithFutureShardedMapExperiment():
     def Go():
-        futureobj = futuregcsfileshardedpagemap(LogPage, "/emlyn-experiments-samples/UTF-8-demo.txt", queue="background")
+        futureobj = futuregcsfileshardedpagemap(LogPageFuture, "/emlyn-experiments-samples/UTF-8-demo.txt", queue="background")
         return futureobj.key
     return "Traverse File With Future Sharded Map", Go

@@ -1,8 +1,8 @@
 from model.account import Account
-from taskutils import ndbshardedmap, futurendbshardedmapwithcount
+from taskutils.ndbsharded2 import ndbshardedmap, futurendbshardedmapwithcount
 import logging
 from taskutils.future import twostagefuture
-from taskutils.ndbsharded import futurendbshardedpagemap, futurendbshardedmap
+from taskutils.ndbsharded2 import futurendbshardedpagemap, futurendbshardedmap
 
 def IncrementAccountsWithShardedMapExperiment():
     def Go():
@@ -21,9 +21,10 @@ def IncrementAccountsWithShardedMapExperiment():
 def IncrementAccountsWithFutureShardedMapExperiment():
     def Go():
         def AddFreeCredit(creditamount):
-            def IncrementBalance(account):
+            def IncrementBalance(futurekey, account):
                 account.balance += creditamount
                 account.put()
+                return 1
                 
             futureobj = futurendbshardedmapwithcount(IncrementBalance, Account.query(), queue="background")
             return futureobj.key
@@ -48,5 +49,7 @@ def CountAndIncrementAccountsExperiment():
             futureobj = twostagefuture(GetCountAccountsFuture, GetIncrementAccountsFuture, queue="background")
             #futureobj = futurendbshardedmapwithcount(IncrementBalance, Account.query(), queue="background")
             return futureobj.key
+        
+        raise Exception("To be fixed")
         return AddFreeCredit(10)
     return "Count & Increment", Go
