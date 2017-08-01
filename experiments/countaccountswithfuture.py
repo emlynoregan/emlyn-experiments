@@ -1,10 +1,10 @@
 from model.account import Account
-from taskutils.future2 import future, FutureReadyForResult, get_children, setlocalprogress,\
+from taskutils.future import future, FutureReadyForResult, setlocalprogress,\
     GenerateOnAllChildSuccess
 import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import metadata
-from taskutils.ndbsharded2 import futurendbshardedpagemap, futurendbshardedmap
+from taskutils.ndbsharded import futurendbshardedpagemap
 
 def CountAccountsWithFutureExperiment():
     def Go():

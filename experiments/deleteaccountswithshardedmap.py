@@ -1,5 +1,5 @@
 from model.account import Account
-from taskutils.ndbsharded2 import ndbshardedmap, futurendbshardedmap, ndbshardedpagemap
+from taskutils.ndbsharded import ndbshardedmap, futurendbshardedmap, ndbshardedpagemap
 from google.appengine.ext import ndb
 
 def DeleteAccountsWithShardedMapExperiment():

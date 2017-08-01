@@ -1,10 +1,9 @@
 from flask import render_template, request, redirect
 
-from experiments.helloworld import HelloWorldExperiment
 from experiments.incrementaccountsnaive import IncrementAccountsExperimentNaive
 from experiments.incrementaccountswithtask import IncrementAccountsWithTaskExperiment
-from experiments.incrementaccountswithshardedmap import IncrementAccountsWithShardedMapExperiment, IncrementAccountsWithFutureShardedMapExperiment,\
-    CountAndIncrementAccountsExperiment
+from experiments.incrementaccountswithshardedmap import IncrementAccountsWithShardedMapExperiment, IncrementAccountsWithFutureShardedMapExperiment #,\
+#    CountAndIncrementAccountsExperiment
 from experiments.deleteaccountswithshardedmap import DeleteAccountsWithShardedMapExperiment, DeleteAccountsWithFutureShardedMapExperiment,\
     DeleteAccountsWithShardedPageMapExperiment
 from experiments.makeaccounts import MakeAccountsExperiment
@@ -20,7 +19,7 @@ def get_switchboard(app):
         TraverseFileWithShardedMapExperiment(),
         CountAllUnderscoreEntitiesExperiment(),
         CountAccountsWithFutureShardedMapExperiment(),
-        CountAndIncrementAccountsExperiment(),
+#         CountAndIncrementAccountsExperiment(),
         IncrementAccountsWithFutureShardedMapExperiment(),
         DeleteAccountsWithFutureShardedMapExperiment(),
         CountAccountsWithFutureExperiment(),
@@ -31,8 +30,7 @@ def get_switchboard(app):
         DeleteAccountsWithShardedPageMapExperiment(),
         DeleteAccountsWithShardedMapExperiment(),
         MakeAccountsExperiment(),
-        MaxTaskSizeExperiment(),
-        HelloWorldExperiment()
+        MaxTaskSizeExperiment()
     ]
 
     @app.route('/', methods=["GET", "POST"])

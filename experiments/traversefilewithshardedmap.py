@@ -1,5 +1,5 @@
 import logging
-from taskutils.gcsfilesharded2 import gcsfileshardedpagemap,\
+from taskutils.gcsfilesharded import gcsfileshardedpagemap,\
     futuregcsfileshardedpagemap
 
 def LogPage(page):
