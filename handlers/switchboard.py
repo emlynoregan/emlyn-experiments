@@ -11,7 +11,10 @@ from experiments.countaccountswithfuture import CountAccountsWithFutureExperimen
     SummarizeAccountsWithFutureShardedMapExperiment
 from experiments.maxtasksize import MaxTaskSizeExperiment
 from experiments.traversefilewithshardedmap import TraverseFileWithShardedMapExperiment,\
-    TraverseFileWithFutureShardedMapExperiment
+    TraverseFileWithFutureShardedMapExperiment, Make100FilesExperiment, Make1000FilesExperiment, Make10000FilesExperiment, DeleteFilesExperiment ,\
+    GCSFileCombine1Experiment,\
+    CountFilesSourceExperiment, CountFilesTargetExperiment
+#     ComposeTargetFilesExperiment
 
 def get_switchboard(app):
     experiments = [
@@ -30,7 +33,15 @@ def get_switchboard(app):
         DeleteAccountsWithShardedPageMapExperiment(),
         DeleteAccountsWithShardedMapExperiment(),
         MakeAccountsExperiment(),
-        MaxTaskSizeExperiment()
+        MaxTaskSizeExperiment(),
+        Make100FilesExperiment(),
+        Make1000FilesExperiment(),
+        Make10000FilesExperiment(),
+        DeleteFilesExperiment(),
+        GCSFileCombine1Experiment(),
+        CountFilesSourceExperiment(),
+        CountFilesTargetExperiment()
+#         ComposeTargetFilesExperiment()
     ]
 
     @app.route('/', methods=["GET", "POST"])

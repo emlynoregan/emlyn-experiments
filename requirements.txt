@@ -1,3 +1,3 @@
 flask
 yccloudpickle
-appenginetaskutils==0.3.1
+appenginetaskutils==0.3.9
